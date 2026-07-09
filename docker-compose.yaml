@@ -1,0 +1,37 @@
+services:
+  payhub-db:
+    image: postgres:14.0-alpine
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_PAYHUB_USER}"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+    environment:
+      POSTGRES_USER: ${POSTGRES_PAYHUB_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PAYHUB_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_PAYHUB_DB}
+    volumes:
+      - payhub-db:/var/lib/postgresql/data
+    ports:
+      - 15432:5432
+  payhub-app:
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    depends_on:
+      payhub-db:
+        condition: service_healthy
+    ports:
+      - 3000:3000
+
+volumes:
+  payhub-db: 
