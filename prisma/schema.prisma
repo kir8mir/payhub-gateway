@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Provider {
+  PSP
+  GSP
+}
+
+enum WebhookStatus {
+  RECEIVED
+  PROCESSED
+  NOT_PROCESSED
+}
+
+model RawWebhook {
+  id        Int      @id @default(autoincrement())
+  provider  Provider
+  brandId   Int
+  payload   Json
+  idempotencyKey String   
+  status    WebhookStatus
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  brandId       Int
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+  sessions      Session[]
+}
+
+model IdempotencyKey {
+  id        Int      @id @default(autoincrement())
+  key       String   
+  brandId  Int
+  requestHash String
+  storedResponse Json
+  createdAt DateTime @default(now())
+
+  @@unique([brandId, key])
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique
+  user     User      @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
