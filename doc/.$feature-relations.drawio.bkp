@@ -1,0 +1,293 @@
+<mxfile host="Electron">
+  <diagram name="Feature &amp; Domain Relations" id="payhub-arch-v1">
+    <mxGraphModel dx="3523" dy="1418" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="980" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title-main" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;" value="payhub-gateway" vertex="1">
+          <mxGeometry height="32" width="600" x="325" as="geometry" />
+        </mxCell>
+        <mxCell id="identity-module" parent="1" style="swimlane;startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;html=1;" value="Identity Module" vertex="1">
+          <mxGeometry height="140" width="450" x="-10" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-register" parent="identity-module" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=10;html=1;" value="POST /auth/register" vertex="1">
+          <mxGeometry height="32" width="190" x="250" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-login" parent="identity-module" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=10;html=1;" value="POST /auth/login" vertex="1">
+          <mxGeometry height="32" width="190" x="250" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-me" parent="identity-module" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=10;html=1;" value="GET /profile/me&lt;br&gt;&lt;i&gt;&amp;nbsp;&lt;b&gt;JWT&lt;/b&gt; required&lt;/i&gt;" vertex="1">
+          <mxGeometry height="32" width="205" x="20" y="54" as="geometry" />
+        </mxCell>
+        <mxCell id="health-module" parent="1" style="swimlane;startSize=28;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;html=1;" value="Health Module" vertex="1">
+          <mxGeometry height="80" width="185" x="458" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-health" parent="health-module" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=10;html=1;" value="GET /health" vertex="1">
+          <mxGeometry height="32" width="155" x="14" y="32" as="geometry" />
+        </mxCell>
+        <mxCell id="callbacks-module" parent="1" style="swimlane;startSize=28;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=12;html=1;" value="Callbacks Module" vertex="1">
+          <mxGeometry height="140" width="570" x="655" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-psp" parent="callbacks-module" style="rounded=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;html=1;" value="POST /webhooks/psp/:provider" vertex="1">
+          <mxGeometry height="32" width="240" x="12" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-gsp" parent="callbacks-module" style="rounded=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;html=1;" value="POST /webhooks/gsp/:provider" vertex="1">
+          <mxGeometry height="32" width="240" x="12" y="82" as="geometry" />
+        </mxCell>
+        <mxCell id="ep-brand" parent="callbacks-module" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;html=1;" value="Header: x-brand-id&lt;br&gt;&lt;i&gt;Tenant Context (required)&lt;/i&gt;" vertex="1">
+          <mxGeometry height="53" width="250" x="298" y="51" as="geometry" />
+        </mxCell>
+        <mxCell id="auth-service" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;html=1;whiteSpace=wrap;" value="&lt;b&gt;AuthService&lt;/b&gt;&lt;br&gt;register · login · me" vertex="1">
+          <mxGeometry height="52" width="200" x="115" y="278" as="geometry" />
+        </mxCell>
+        <mxCell id="callback-service" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;html=1;whiteSpace=wrap;" value="&lt;b&gt;CallbackService&lt;/b&gt;&lt;br&gt;handlePsp · handleGsp · processCallback" vertex="1">
+          <mxGeometry height="52" width="280" x="800" y="278" as="geometry" />
+        </mxCell>
+        <mxCell id="cc-jwt" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;JWT Auth Guard&lt;/b&gt;&lt;br&gt;validates Bearer token" vertex="1">
+          <mxGeometry height="50" width="185" x="20" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="cc-tenant" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;Tenant Isolation&lt;/b&gt;&lt;br&gt;brandId scopes all queries" vertex="1">
+          <mxGeometry height="50" width="185" x="680" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="cc-idempotency" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;Idempotency&lt;/b&gt;&lt;br&gt;DB unique · race-safe P2002" vertex="1">
+          <mxGeometry height="50" width="185" x="1020" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="cc-correlation" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;CorrelationIdInterceptor&lt;/b&gt;&lt;br&gt;reads id from request&lt;br&gt;&lt;i&gt;sets x-correlation-id on response&lt;/i&gt;" vertex="1">
+          <mxGeometry height="60" width="185" x="1250" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="cc-filter" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;GlobalExceptionFilter&lt;/b&gt;&lt;br&gt;structured errors&lt;br&gt;&lt;i&gt;statusCode · message · correlationId&lt;/i&gt;" vertex="1">
+          <mxGeometry height="60" width="205" x="430" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="cc-middleware" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;CorrelationIdMiddleware&lt;/b&gt;&lt;br&gt;reads / generates UUID&lt;br&gt;&lt;i&gt;sets on request · runs before guards&lt;/i&gt;" vertex="1">
+          <mxGeometry height="60" width="205" x="1465" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="entity-user" parent="1" style="swimlane;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;html=1;" value="&lt;b&gt;User&lt;/b&gt;" vertex="1">
+          <mxGeometry height="150" width="215" x="5" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="u-f1" parent="entity-user" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="id: Int (PK)" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="u-f2" parent="entity-user" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;verticalAlign=middle;" value="brandId: Int  ← tenant key" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="u-f3" parent="entity-user" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="email: String (unique)" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="62" as="geometry" />
+        </mxCell>
+        <mxCell id="u-f4" parent="entity-user" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="passwordHash: String" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="u-f5" parent="entity-user" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="createdAt: DateTime" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="98" as="geometry" />
+        </mxCell>
+        <mxCell id="u-f6" parent="entity-user" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;verticalAlign=middle;" value="sessions: Session[]" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="116" as="geometry" />
+        </mxCell>
+        <mxCell id="entity-session" parent="1" style="swimlane;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;html=1;" value="&lt;b&gt;Session&lt;/b&gt;" vertex="1">
+          <mxGeometry height="132" width="215" x="315" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="s-f1" parent="entity-session" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="id: Int (PK)" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s-f2" parent="entity-session" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="userId: Int (FK → User)" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="s-f3" parent="entity-session" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="token: String (unique)" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="62" as="geometry" />
+        </mxCell>
+        <mxCell id="s-f4" parent="entity-session" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="expiresAt: DateTime" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s-f5" parent="entity-session" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="createdAt: DateTime" vertex="1">
+          <mxGeometry height="18" width="197" x="8" y="98" as="geometry" />
+        </mxCell>
+        <mxCell id="entity-webhook" parent="1" style="swimlane;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;html=1;" value="&lt;b&gt;RawWebhook&lt;/b&gt;" vertex="1">
+          <mxGeometry height="150" width="230" x="825" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="wh-f1" parent="entity-webhook" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="id: Int (PK)" vertex="1">
+          <mxGeometry height="18" width="210" x="8" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="wh-f2" parent="entity-webhook" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="provider: Provider (PSP | GSP)" vertex="1">
+          <mxGeometry height="18" width="210" x="8" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="wh-f3" parent="entity-webhook" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;verticalAlign=middle;" value="brandId: Int  ← tenant key" vertex="1">
+          <mxGeometry height="18" width="210" x="8" y="62" as="geometry" />
+        </mxCell>
+        <mxCell id="wh-f4" parent="entity-webhook" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="payload: Json (raw event body)" vertex="1">
+          <mxGeometry height="18" width="210" x="8" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="wh-f5" parent="entity-webhook" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="idempotencyKey: String" vertex="1">
+          <mxGeometry height="18" width="210" x="8" y="98" as="geometry" />
+        </mxCell>
+        <mxCell id="wh-f6" parent="entity-webhook" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="status: WebhookStatus" vertex="1">
+          <mxGeometry height="18" width="210" x="8" y="116" as="geometry" />
+        </mxCell>
+        <mxCell id="entity-idem" parent="1" style="swimlane;startSize=24;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;html=1;" value="&lt;b&gt;IdempotencyKey&lt;/b&gt;" vertex="1">
+          <mxGeometry height="150" width="240" x="1110" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="ik-f1" parent="entity-idem" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="id: Int (PK)" vertex="1">
+          <mxGeometry height="18" width="220" x="8" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="ik-f2" parent="entity-idem" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontStyle=2;verticalAlign=middle;" value="brandId: Int  ← tenant key" vertex="1">
+          <mxGeometry height="18" width="220" x="8" y="44" as="geometry" />
+        </mxCell>
+        <mxCell id="ik-f3" parent="entity-idem" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="key: String  (PSP|GSP:p:webhookId)" vertex="1">
+          <mxGeometry height="18" width="220" x="8" y="62" as="geometry" />
+        </mxCell>
+        <mxCell id="ik-f4" parent="entity-idem" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="requestHash: String (sha256)" vertex="1">
+          <mxGeometry height="18" width="220" x="8" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ik-f5" parent="entity-idem" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="storedResponse: Json" vertex="1">
+          <mxGeometry height="18" width="220" x="8" y="98" as="geometry" />
+        </mxCell>
+        <mxCell id="ik-f6" parent="entity-idem" style="text;html=1;strokeColor=none;fillColor=#fff2cc;align=left;fontSize=10;fontStyle=1;verticalAlign=middle;" value="@@unique([brandId, key])" vertex="1">
+          <mxGeometry height="18" width="220" x="8" y="116" as="geometry" />
+        </mxCell>
+        <mxCell id="prisma-service" parent="1" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;html=1;whiteSpace=wrap;" value="&lt;b&gt;PrismaService&lt;/b&gt;&lt;br&gt;extends PrismaClient&lt;br&gt;@prisma/adapter-pg" vertex="1">
+          <mxGeometry height="64" width="210" x="520" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" value="&lt;b&gt;PostgreSQL 14&lt;/b&gt;&lt;br&gt;Docker container" vertex="1">
+          <mxGeometry height="74" width="170" x="880" y="855" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-box" parent="1" style="swimlane;startSize=22;fillColor=#f5f5f5;strokeColor=#999999;fontStyle=1;fontSize=10;html=1;" value="Legend" vertex="1">
+          <mxGeometry height="125" width="200" x="1330" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-1" parent="legend-box" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;html=1;" value="" vertex="1">
+          <mxGeometry height="14" width="18" x="8" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-1t" parent="legend-box" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="Identity" vertex="1">
+          <mxGeometry height="14" width="150" x="32" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-2" parent="legend-box" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;html=1;" value="" vertex="1">
+          <mxGeometry height="14" width="18" x="8" y="46" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-2t" parent="legend-box" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="Callbacks / Services" vertex="1">
+          <mxGeometry height="14" width="150" x="32" y="46" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-3" parent="legend-box" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;html=1;" value="" vertex="1">
+          <mxGeometry height="14" width="18" x="8" y="66" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-3t" parent="legend-box" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="Cross-cutting concerns" vertex="1">
+          <mxGeometry height="14" width="150" x="32" y="66" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-4" parent="legend-box" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;html=1;" value="" vertex="1">
+          <mxGeometry height="14" width="18" x="8" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-4t" parent="legend-box" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="Domain models (Prisma)" vertex="1">
+          <mxGeometry height="14" width="150" x="32" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-5" parent="legend-box" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;html=1;" value="" vertex="1">
+          <mxGeometry height="14" width="18" x="8" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-5t" parent="legend-box" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;verticalAlign=middle;" value="Persistence layer" vertex="1">
+          <mxGeometry height="14" width="150" x="32" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="e-1" edge="1" parent="1" source="identity-module" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="auth-service" value="delegates to">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-2" edge="1" parent="1" source="callbacks-module" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="callback-service" value="delegates to">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-3" edge="1" parent="1" source="auth-service" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" target="entity-user" value="reads / writes">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="215" y="460" />
+              <mxPoint x="113" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-4" edge="1" parent="1" source="auth-service" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="entity-session" value="creates">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="215" y="420" />
+              <mxPoint x="250" y="420" />
+              <mxPoint x="250" y="460" />
+              <mxPoint x="423" y="460" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-5" edge="1" parent="1" source="callback-service" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" target="entity-webhook" value="persists raw event">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-6" edge="1" parent="1" source="callback-service" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" target="entity-idem" value="checks &amp; stores">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-7" edge="1" parent="1" source="entity-user" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="prisma-service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-8" edge="1" parent="1" source="entity-session" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="prisma-service">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="423" y="710" />
+              <mxPoint x="625" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-9" edge="1" parent="1" source="entity-webhook" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="prisma-service">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="940" y="710" />
+              <mxPoint x="625" y="710" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-10" edge="1" parent="1" source="entity-idem" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="prisma-service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-11" edge="1" parent="1" source="prisma-service" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" target="postgres" value="pg adapter">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-12" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;endArrow=ERmany;startArrow=ERone;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="entity-session" value="1 : N">
+          <mxGeometry relative="1" x="-0.02" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="220" y="586" as="sourcePoint" />
+            <mxPoint x="320" y="595" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-13" edge="1" parent="1" source="cc-jwt" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="ep-me" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-14" edge="1" parent="1" source="cc-tenant" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="callback-service" value="scopes queries">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-15" edge="1" parent="1" source="cc-idempotency" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="entity-idem" value="enforces via DB unique">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ihViuIwQbZRkrxy8DmBA-1" edge="1" parent="1" source="auth-service" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" target="cc-jwt" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="323" y="296" as="sourcePoint" />
+            <mxPoint x="177" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-filter-1" edge="1" parent="1" source="cc-filter" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="identity-module" value="handles errors">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="533" y="240" />
+              <mxPoint x="215" y="240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-filter-2" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;strokeWidth=2;entryX=0.25;entryY=1;entryDx=0;entryDy=0;" target="callbacks-module" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="533" y="240" />
+              <mxPoint x="798" y="240" />
+              <mxPoint x="798" y="210" />
+            </Array>
+            <mxPoint x="533" y="380" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-corr-1" edge="1" parent="1" source="cc-correlation" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;strokeWidth=2;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" target="callbacks-module" value="injects correlationId">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1342" y="260" />
+              <mxPoint x="1082" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e-middleware-1" edge="1" parent="1" source="cc-middleware" target="cc-correlation" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;strokeColor=#d6b656;endArrow=open;endFill=0;strokeWidth=2;" value="provides id">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

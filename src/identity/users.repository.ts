@@ -5,15 +5,15 @@ import { PrismaService } from '../persistence/prisma/prisma.service';
 export class UsersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByEmail(email: string) {
+  findByEmail(email: string, brandId: number) {
     return this.prisma.user.findUnique({
-      where: { email },
+      where: { email_brandId: { email, brandId } },
     });
   }
 
-  findById(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
+  findById(id: number, brandId: number) {
+    return this.prisma.user.findFirst({
+      where: { id, brandId },
     });
   }
 

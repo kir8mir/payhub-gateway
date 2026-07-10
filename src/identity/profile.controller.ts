@@ -11,6 +11,6 @@ export class ProfileController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   me(@Req() req: Request & { user: JwtPayload }) {
-    return this.authService.me(req.user.sub);
+    return this.authService.me(req.user.sub, req.user.brandId);
   }
 }

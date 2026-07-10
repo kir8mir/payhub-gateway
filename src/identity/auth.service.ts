@@ -21,7 +21,10 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const existingUser = await this.usersRepository.findByEmail(dto.email);
+    const existingUser = await this.usersRepository.findByEmail(
+      dto.email,
+      dto.brandId,
+    );
 
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
@@ -43,7 +46,10 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = await this.usersRepository.findByEmail(dto.email);
+    const user = await this.usersRepository.findByEmail(
+      dto.email,
+      dto.brandId,
+    );
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -76,8 +82,8 @@ export class AuthService {
     return { accessToken };
   }
 
-  async me(userId: number) {
-    const user = await this.usersRepository.findById(userId);
+  async me(userId: number, brandId: number) {
+    const user = await this.usersRepository.findById(userId, brandId);
 
     if (!user) {
       throw new NotFoundException('User not found');
