@@ -19,6 +19,17 @@ generates one.
 
 ---
 
+## Request pipeline
+
+<img width="666" height="877" alt="request-lifecycle drawio" src="https://github.com/user-attachments/assets/e5267121-cd14-4079-bc05-de89f26dd412" />
+
+Every request goes through the same pipeline before reaching a controller:
+correlation id → auth guard (protected routes) → logging interceptor →
+validation → handler. Any exception at any step is caught by the same global
+filter and turned into the error shape above.
+
+--
+
 ## Identity
 
 ### `POST /auth/register`
