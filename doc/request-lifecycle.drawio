@@ -10,13 +10,13 @@
         <mxCell id="lc-request-in" parent="1" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;html=1;whiteSpace=wrap;fontColor=#333333;" value="Incoming HTTP Request" vertex="1">
           <mxGeometry height="45" width="280" x="50" y="50" as="geometry" />
         </mxCell>
-        <mxCell id="lc-middleware" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;CorrelationIdMiddleware&lt;/b&gt;&lt;br&gt;reads x-correlation-id header&lt;br&gt;&lt;i&gt;generates UUID if absent · sets on request&lt;/i&gt;" vertex="1">
-          <mxGeometry height="70" width="280" x="50" y="150" as="geometry" />
+        <mxCell id="lc-middleware" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;CorrelationIdMiddleware&lt;/b&gt;&lt;br&gt;reads x-correlation-id header&lt;br&gt;&lt;i&gt;generates UUID if absent · sets on request&lt;/i&gt;&lt;br&gt;&lt;i&gt;sets on response header — runs before guards, so every response gets it&lt;/i&gt;" vertex="1">
+          <mxGeometry height="88" width="280" x="50" y="150" as="geometry" />
         </mxCell>
         <mxCell id="lc-guard" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;JwtAuthGuard&lt;/b&gt;&lt;br&gt;validates Bearer token&lt;br&gt;&lt;i&gt;only on protected routes&lt;/i&gt;" vertex="1">
           <mxGeometry height="65" width="280" x="50" y="280" as="geometry" />
         </mxCell>
-        <mxCell id="lc-interceptor" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;CorrelationIdInterceptor&lt;/b&gt;&lt;br&gt;reads id from request&lt;br&gt;&lt;i&gt;sets x-correlation-id on response header&lt;/i&gt;" vertex="1">
+        <mxCell id="lc-interceptor" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;CorrelationIdInterceptor&lt;/b&gt;&lt;br&gt;reads id from request&lt;br&gt;&lt;i&gt;on response: logs method · path · status · duration&lt;/i&gt;" vertex="1">
           <mxGeometry height="70" width="280" x="50" y="400" as="geometry" />
         </mxCell>
         <mxCell id="lc-pipe" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;ValidationPipe&lt;/b&gt;&lt;br&gt;validates &amp; transforms DTO&lt;br&gt;&lt;i&gt;whitelist · forbidNonWhitelisted&lt;/i&gt;" vertex="1">
@@ -25,14 +25,14 @@
         <mxCell id="lc-handler" parent="1" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;html=1;whiteSpace=wrap;" value="&lt;b&gt;Route Handler&lt;/b&gt;&lt;br&gt;&lt;i&gt;Controller method · business logic&lt;/i&gt;" vertex="1">
           <mxGeometry height="65" width="280" x="50" y="650" as="geometry" />
         </mxCell>
-        <mxCell id="lc-response-out" parent="1" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;html=1;whiteSpace=wrap;fontColor=#333333;" value="Response 2xx&lt;br&gt;&lt;i&gt;x-correlation-id header included&lt;/i&gt;" vertex="1">
+        <mxCell id="lc-response-out" parent="1" style="rounded=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;html=1;whiteSpace=wrap;fontColor=#333333;" value="Response 2xx&lt;br&gt;&lt;i&gt;x-correlation-id header always included (set by middleware)&lt;/i&gt;" vertex="1">
           <mxGeometry height="50" width="280" x="50" y="775" as="geometry" />
         </mxCell>
         <mxCell id="lc-exception-filter" parent="1" style="rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;html=1;whiteSpace=wrap;" value="&lt;b&gt;GlobalExceptionFilter&lt;/b&gt;&lt;br&gt;resolves statusCode · formats message&lt;br&gt;&lt;i&gt;reads correlationId from request&lt;/i&gt;" vertex="1">
           <mxGeometry height="80" width="280" x="420" y="390" as="geometry" />
         </mxCell>
-        <mxCell id="lc-error-response" parent="1" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;html=1;whiteSpace=wrap;" value="Error Response 4xx / 5xx&lt;br&gt;&lt;i&gt;{ statusCode, error, message, correlationId }&lt;/i&gt;" vertex="1">
-          <mxGeometry height="55" width="280" x="420" y="530" as="geometry" />
+        <mxCell id="lc-error-response" parent="1" style="rounded=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;html=1;whiteSpace=wrap;" value="Error Response 4xx / 5xx&lt;br&gt;&lt;i&gt;body: { statusCode, error, message, correlationId }&lt;/i&gt;&lt;br&gt;&lt;i&gt;x-correlation-id header always included (set by middleware)&lt;/i&gt;" vertex="1">
+          <mxGeometry height="70" width="280" x="420" y="530" as="geometry" />
         </mxCell>
         <mxCell id="lc-legend" parent="1" style="swimlane;startSize=22;fillColor=#f5f5f5;strokeColor=#999999;fontStyle=1;fontSize=10;html=1;" value="Legend" vertex="1">
           <mxGeometry height="105" width="205" x="510" as="geometry" />

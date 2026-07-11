@@ -6,12 +6,12 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import { CallbackService } from './callback.service';
+import { CallbackHandlerFactory } from './callback-handler.factory';
 import { CallbackDto } from './dto/callback.dto';
 
 @Controller('webhooks/gsp')
 export class GspCallbackController {
-  constructor(private readonly callbackService: CallbackService) {}
+  constructor(private readonly callbackHandlerFactory: CallbackHandlerFactory) {}
 
   @Post(':provider')
   handleCallback(
@@ -25,6 +25,8 @@ export class GspCallbackController {
       throw new BadRequestException('x-brand-id header is required');
     }
 
-    return this.callbackService.handleGspCallback(provider, brandId, body);
+    return this.callbackHandlerFactory
+      .create('GSP')
+      .handle(provider, brandId, body);
   }
 }

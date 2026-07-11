@@ -5,9 +5,11 @@ import { CORRELATION_ID_HEADER } from '../interceptors/correlation-id.intercepto
 
 @Injectable()
 export class CorrelationIdMiddleware implements NestMiddleware {
-  use(req: Request, _res: Response, next: NextFunction): void {
+  use(req: Request, res: Response, next: NextFunction): void {
     const existing = req.headers[CORRELATION_ID_HEADER] as string | undefined;
-    req.headers[CORRELATION_ID_HEADER] = existing ?? randomUUID();
+    const correlationId = existing ?? randomUUID();
+    req.headers[CORRELATION_ID_HEADER] = correlationId;
+    res.setHeader(CORRELATION_ID_HEADER, correlationId);
     next();
   }
 }
