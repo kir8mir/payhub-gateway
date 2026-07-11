@@ -83,20 +83,18 @@ docker build --target build -t payhub-test .
 docker run --rm payhub-test npm test
 ```
 
-**E2E tests** (need a running Postgres — start it first, and use the in-network
-hostname `payhub-db` for `DATABASE_URL`):
+**E2E tests** (need a running Postgres — start it first):
 
 ```bash
 docker compose up -d payhub-db
-docker run --rm --env-file .env --network payhub-gateway_default \
-  -e DATABASE_URL=postgresql://<user>:<pass>@payhub-db:5432/<db> \
-  payhub-test npm run test:e2e
+docker run --rm --env-file .env --network payhub-gateway_default payhub-test npm run test:e2e
 ```
 
-(substitute `<user>`/`<pass>`/`<db>` with the `POSTGRES_PAYHUB_*` values from
-your `.env`). E2E tests generate their own random `brandId`/email/webhookId
-per run, so they don't need any seed data and are safe to re-run against a
-persistent dev database.
+`.env`'s `DATABASE_URL` already points at `payhub-db` (the in-network hostname
+used by docker-compose), so `--env-file .env` is all that's needed — no
+override required. E2E tests generate their own random
+`brandId`/email/webhookId per run, so they don't need any seed data and are
+safe to re-run against a persistent dev database.
 
 ## Project structure
 
