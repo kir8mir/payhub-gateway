@@ -21,17 +21,22 @@ export class CorrelationIdInterceptor implements NestInterceptor {
 
     const correlationId = request.headers[CORRELATION_ID_HEADER] as string;
     const startedAt = Date.now();
+    const isHealthCheck = request.originalUrl.startsWith('/health');
 
     return next.handle().pipe(
-      tap(() =>
+      tap(() => {
+        if (isHealthCheck) {
+          return;
+        }
+
         this.logger.log({
           correlationId,
           method: request.method,
           path: request.originalUrl,
           statusCode: response.statusCode,
           durationMs: Date.now() - startedAt,
-        }),
-      ),
+        });
+      }),
     );
   }
 }

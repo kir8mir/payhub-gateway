@@ -1,98 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# payhub-gateway
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A small backend service exploring reliable payment-provider callback handling with
+multi-tenant isolation — the part of fintech/iGaming payment infrastructure that
+sits between "PSP/GSP sends us a webhook" and "we can trust and process it safely."
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+PSP and GSP are fully mocked (no
+real external providers, no balance/ledger logic) — the focus is on the plumbing
+around them: identity, callback ingestion, idempotency, and tenant isolation.
 
-## Description
+## Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js 22, NestJS + TypeScript
+- Prisma 7 (`@prisma/adapter-pg`) + PostgreSQL
+- Docker / docker-compose
 
-## Project setup
+## What's implemented
 
-```bash
-$ npm install
-```
+- **identity** — register / login (JWT) / `GET /profile/me`, email scoped per
+  brand (`@@unique([email, brandId])`), not globally.
+- **callbacks** — `POST /webhooks/psp/:provider` and `POST /webhooks/gsp/:provider`,
+  protected by an HMAC-SHA256 signature guard, routed through a Strategy + Factory
+  pair (`CallbackHandlerFactory` → `PspCallbackHandler` / `GspCallbackHandler`) so
+  the adapters can only ever persist a raw event — never touch a balance.
+  Idempotent by construction: a DB-level unique constraint
+  (`@@unique([brandId, key])`) is the actual source of truth, not just an
+  in-code check, so concurrent duplicate callbacks can't race past it.
+- **tenant isolation** — every query is explicitly scoped by `brandId`, sourced
+  from the JWT for identity routes and from the `x-brand-id` header for webhooks.
+- **observability** — every request gets a correlation id (`x-correlation-id`,
+  generated if the caller didn't send one), guaranteed on every response
+  including errors; every request is logged with method/path/status/duration.
+- **structured errors** — a global exception filter returns
+  `{ statusCode, error, message, correlationId }` for every failure.
 
-## Compile and run the project
+See [API.md](API.md) for request examples and [DECISIONS.md](DECISIONS.md) for
+the reasoning behind these choices and the trade-offs that come with them.
 
-```bash
-# development
-$ npm run start
+## Prerequisites
 
-# watch mode
-$ npm run start:dev
+- Docker + Docker Compose
 
-# production mode
-$ npm run start:prod
-```
+Nothing else — Node/npm/Prisma are only used inside the containers.
 
-## Run tests
+## Run it
 
 ```bash
-# unit tests
-$ npm run test
+cp .env.example .env
+# edit .env if you want different secrets/ports, defaults work as-is
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up --build
 ```
 
-## Deployment
+This builds the app image, starts PostgreSQL, waits for it to be healthy, then
+starts the API. On every boot the app runs `prisma db push` against the DB
+(see [DECISIONS.md](DECISIONS.md) for why this project uses `db push` instead of
+migration files), so the schema is always in sync — no separate migrate step.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- API: http://localhost:3000
+- Health check: `GET /health`
+- PostgreSQL is also reachable on the host at `localhost:15432` (mapped from the
+  container's internal `5432`, in case you already have a local Postgres on the
+  default port)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Running the tests
+
+Tests run against the `build` stage of the image (it has the dev dependencies
+the `runtime` stage intentionally doesn't ship with):
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker build --target build -t payhub-test .
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+**Unit tests** (no DB required):
 
-## Resources
+```bash
+docker run --rm payhub-test npm test
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+**E2E tests** (need a running Postgres — start it first, and use the in-network
+hostname `payhub-db` for `DATABASE_URL`):
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+docker compose up -d payhub-db
+docker run --rm --env-file .env --network payhub-gateway_default \
+  -e DATABASE_URL=postgresql://<user>:<pass>@payhub-db:5432/<db> \
+  payhub-test npm run test:e2e
+```
 
-## Support
+(substitute `<user>`/`<pass>`/`<db>` with the `POSTGRES_PAYHUB_*` values from
+your `.env`). E2E tests generate their own random `brandId`/email/webhookId
+per run, so they don't need any seed data and are safe to re-run against a
+persistent dev database.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Project structure
 
-## Stay in touch
+```
+src/
+  identity/     auth (register/login/JWT), profile
+  callbacks/    PSP/GSP webhook controllers, Strategy+Factory handlers
+  common/       guards, interceptors, middleware, exception filter
+  persistence/  PrismaService / PrismaModule
+  health/       health check endpoint
+test/           e2e specs (idempotency, tenant leakage, auth guard)
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Deliverables
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- [API.md](API.md) — request/response examples for every endpoint
+- [DECISIONS.md](DECISIONS.md) — design choices and trade-offs
