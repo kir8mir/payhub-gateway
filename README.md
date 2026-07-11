@@ -36,6 +36,12 @@ around them: identity, callback ingestion, idempotency, and tenant isolation.
 See [API.md](API.md) for request examples and [DECISIONS.md](DECISIONS.md) for
 the reasoning behind these choices and the trade-offs that come with them.
 
+## Architecture
+<img width="2004" height="930" alt="feature-relations drawio" src="https://github.com/user-attachments/assets/6fe6d49c-581b-424c-a926-1b310e4eaaf7" />
+Modules, the Strategy+Factory callback handler pair, tenant-scoped
+repositories, and cross-cutting concerns (guards, correlation id, structured
+errors). See [DECISIONS.md](DECISIONS.md) for the reasoning behind each piece.
+
 ## Prerequisites
 
 - Docker + Docker Compose
