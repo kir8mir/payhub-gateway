@@ -127,9 +127,10 @@ idempotency key. Sending the same `webhookId` again for the same
 ### `POST /webhooks/psp/:provider`
 
 ```bash
-SECRET="$WEBHOOK_SECRET"
+source .env   # loads WEBHOOK_SECRET from your .env into this shell
+
 BODY='{"webhookId":"evt_123","payload":{"amount":100}}'
-SIGNATURE=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$SECRET" -hex | sed 's/^.* //')
+SIGNATURE=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -hex | sed 's/^.* //')
 
 curl -X POST http://localhost:3000/webhooks/psp/stripe \
   -H "Content-Type: application/json" \
@@ -172,6 +173,7 @@ curl -X POST http://localhost:3000/webhooks/gsp/betsoft \
 **curl / shell:**
 
 ```bash
+source .env   # loads WEBHOOK_SECRET into this shell, if not already set
 SIGNATURE=$(printf '%s' "$BODY" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -hex | sed 's/^.* //')
 ```
 
